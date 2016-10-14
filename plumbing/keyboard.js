@@ -3,12 +3,15 @@ const to = require('to2')
 const split = require('split2')
 const onend = require('end-of-stream')
 const synthClock = require('./clock')
+const teoria = require('teoria')
 
-const kmin = 24
-const kmax = 144
-const NUM_KEYS = kmax - kmin
 
 module.exports = function (clock) {
+  const midi = require('web-midi')
+  const input = midi.openInput('Q49 MIDI 1')
+  const kmin = 24
+  const kmax = 144
+  const NUM_KEYS = kmax - kmin
   const state = {
     time: 0,
     keys: Array(NUM_KEYS).fill(0),
@@ -16,25 +19,19 @@ module.exports = function (clock) {
     onChange: null
   }
 
-  ;(function recon () {
-    let stream = wsock('ws:///10.0.213.215:5000')
-    onend(stream, recon)
-    stream.pipe(split(JSON.parse))
-      .pipe(to.obj(write))
-    return recon
 
-    function write (row, enc, next) {
-      const keydown = (row.values[0] >> 4) & 1
-      const k = row.values[1] - kmin
-      state.time = synthClock.time
-      state.keys[k] = keydown * row.values[2] / 128
-      state.times[k * 2 + keydown] = state.time
-      if (state.onChange) {
-        state.onChange(state.keys)
-      }
-      next()
+  input.on('data', function(data, delta){
+    const keydown = (data[0] >> 4) & 1
+    const k = data[1] 
+    console.log(keydown, Math.pow(2, (k - 69)/12)*441, teoria.note.fromMIDI(k).fq())
+    state.time = synthClock.time
+    state.keys[k] = keydown * data[2] / 128
+    state.times[k * 2 + keydown] = state.time
+    console.log(state.keys[k])
+    if (state.onChange) {
+      state.onChange(state.keys)
     }
-  })()
+  })
 
   return state
 }

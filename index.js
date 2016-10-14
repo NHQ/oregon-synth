@@ -5,7 +5,6 @@ const regl = require('regl')({
 })
 const keyboard = require('./plumbing/keyboard')()
 const audioContext = new window.AudioContext()
-
 require('./gfx')({
   regl,
   keyboard

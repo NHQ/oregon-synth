@@ -6,7 +6,7 @@ module.exports = function createSynth (options) {
   const state = options.keyboard
 
   const NUM_KEYS = state.keys.length
-
+console.log(NUM_KEYS)
   const shaderCode = options.shader
   const filterCode = options.filter
   const contextVars = options.context || {}
@@ -104,7 +104,6 @@ module.exports = function createSynth (options) {
     primitive: 'triangles',
     elements: null
   })
-
   const filterSound = regl({
     vert: `
     precision highp float;

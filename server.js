@@ -25,6 +25,5 @@ input.on('message', function (dt, msg) {
   for (var i = 0; i < streams.length; i++) {
     streams[i].write(JSON.stringify(row) + '\n')
   }
-  console.log(row)
 })
-input.openPort(1)
+//input.openPort(2)
